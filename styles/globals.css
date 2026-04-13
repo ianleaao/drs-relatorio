@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Print / PDF ─────────────────────────────────────────────────────────── */
+@media print {
+  /* Renderiza backgrounds escuros e imagens no PDF */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Evita que o body/html corte o conteúdo */
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hero ocupa toda a primeira página A4 e força quebra após */
+  .hero-section {
+    min-height:        297mm !important;
+    page-break-after:  always !important;
+    break-after:       page !important;
+    margin-bottom:     0 !important;
+    padding-bottom:    0 !important;
+  }
+
+  /* Atividades começam no topo da segunda página — sem margin/padding extra */
+  .activities-section {
+    margin-top:         0 !important;
+    page-break-before:  avoid !important;
+    break-before:       avoid !important;
+  }
+
+  /* Nunca cortar dentro de um card, mas permitir quebra *entre* cards */
+  .act-card {
+    break-inside:      avoid !important;
+    page-break-inside: avoid !important;
+    margin-bottom:     12px !important;
+  }
+
+  /* A grade pode quebrar entre itens (break-inside: auto = comportamento padrão) */
+  .activities-grid {
+    break-inside: auto !important;
+  }
+
+  /* Wrapper geral sem gaps */
+  .report-wrapper {
+    margin:  0 !important;
+    padding: 0 !important;
+  }
+}

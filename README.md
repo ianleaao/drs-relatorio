@@ -1,88 +1,90 @@
-# DRS Documentos — Gerador de Relatórios e Propostas em PDF
+# DRS Documents — Report & Proposal PDF Generator
 
-> Painel web que gera, em poucos cliques, os documentos de cliente da **DRS Advogados Associados**: relatório jurídico mensal, proposta de honorários e apresentação de holding — todos em PDF A4 com a identidade visual do escritório.
+> Web panel that generates **DRS Advogados Associados**' client documents in a few clicks: monthly legal report, fee proposal and holding company presentation — all as A4 PDFs with the firm's visual identity.
 
-![Painel de edição com prévia ao vivo](docs/preview.png)
+![Editing panel with live preview](docs/preview.png)
 
-## O que ele gera
+> The app UI and generated documents are in Brazilian Portuguese, as they are sent to the firm's clients in Brazil.
 
-| Documento | Para que serve | Destaques |
+## What it generates
+
+| Document | Purpose | Highlights |
 |---|---|---|
-| **Relatório mensal** | Prestação de contas ao cliente das atividades jurídicas do mês | Capa personalizada, atividades categorizadas automaticamente, horas por atividade e total do mês |
-| **Proposta de honorários** | Proposta comercial para novos serviços | Quadros de conteúdo editáveis, 5 modos de investimento (valor único, mensal, desconto à vista, à vista + parcelado, desconto + parcelado), cálculo automático de desconto, seção da equipe |
-| **Apresentação de holding** | Material sobre estruturação de holding patrimonial | Explicação, vantagens, etapas do projeto em linha do tempo, equipe e contatos |
+| **Monthly report** | Monthly accountability report of the legal work done for each client | Custom cover, activities automatically categorized, hours per activity and monthly total |
+| **Fee proposal** | Commercial proposal for new services | Editable content boxes, 5 pricing modes (single amount, monthly fee, upfront discount, upfront + installments, discount + installments), automatic discount calculation, team section |
+| **Holding presentation** | Material on structuring an asset-holding company | Explanation, benefits, project steps as a timeline, team and contact details |
 
-## Como funciona
+## How it works
 
-1. O painel lateral (`/`) edita os campos e mostra a **prévia ao vivo** do documento.
-2. Ao clicar em **Gerar PDF**, o front envia os dados para `POST /api/gerar-pdf`.
-3. A API abre o **Puppeteer** (Chrome headless) na rota limpa do documento — `/relatorio`, `/proposta` ou `/holding` —, espera fontes e imagens carregarem e imprime em A4.
-4. O PDF volta para o navegador já com nome padronizado, por exemplo `Relatorio-Empresa-Abril-2026.pdf` ou `Proposta-DRS-Cliente-01-10-2026.pdf`.
+1. The side panel (`/`) edits the fields and shows a **live preview** of the document.
+2. Clicking **Gerar PDF** sends the data to `POST /api/gerar-pdf`.
+3. The API launches **Puppeteer** (headless Chrome) on the document's clean route — `/relatorio`, `/proposta` or `/holding` —, waits for fonts and images to load and prints it as A4.
+4. The PDF is downloaded with a standardized name, e.g. `Relatorio-Empresa-Abril-2026.pdf` or `Proposta-DRS-Cliente-01-10-2026.pdf`.
 
-## Stack
+## Tech stack
 
 - **Next.js 14** (Pages Router) + **React 18** + **TypeScript**
-- **Puppeteer 22** para renderização do PDF
-- **Tailwind CSS** + estilos inline para controle fino de impressão (`@page`, quebras de página)
+- **Puppeteer 22** for PDF rendering
+- **Tailwind CSS** + inline styles for fine-grained print control (`@page`, page breaks)
 
-## Como rodar
+## Getting started
 
-Requisitos: Node.js 18+.
+Requirements: Node.js 18+.
 
 ```bash
 git clone https://github.com/ianleaao/drs-relatorio.git
 cd drs-relatorio
-npm install        # também baixa o Chromium usado pelo Puppeteer
+npm install        # also downloads the Chromium used by Puppeteer
 npm run dev
 ```
 
-Acesse **http://localhost:3000**.
+Open **http://localhost:3000**.
 
-Outros comandos:
+Other commands:
 
 ```bash
-npm run typecheck  # verificação de tipos
-npm run build      # build de produção
-npm start          # servidor de produção
+npm run typecheck  # type checking
+npm run build      # production build
+npm start          # production server
 ```
 
-## Arquivos de cliente (não versionados)
+## Client files (not versioned)
 
-Fotos da equipe e logos de clientes **não ficam no repositório** por sigilo. Coloque-os localmente nestas pastas — cada uma tem um `LEIAME.md` explicando o formato:
+Team photos and client logos are **kept out of the repository** for confidentiality. Add them locally to these folders — each one has a `README.md` describing the expected files:
 
-| Pasta | Conteúdo | Usado em |
+| Folder | Contents | Used in |
 |---|---|---|
-| `public/clientes/` | Logos de clientes (`.png`, `.jpg`, `.jpeg`) | Relatório mensal |
-| `public/clientes-relatorio/` | Logos de clientes | Proposta e holding |
-| `public/pessoas/` | `daniel`, `douglas`, `laila` (`.jpg`/`.png`) | Seção "Nossa Equipe" |
+| `public/clientes/` | Client logos (`.png`, `.jpg`, `.jpeg`) | Monthly report |
+| `public/clientes-relatorio/` | Client logos | Proposal and holding |
+| `public/pessoas/` | `daniel`, `douglas`, `laila` (`.jpg`/`.png`) | "Nossa Equipe" (team) section |
 
-No painel, digite só o nome do arquivo sem extensão (ex.: `EMPRESA`). Sem logo, a capa mostra as iniciais do cliente.
+In the panel, type only the file name without the extension (e.g. `EMPRESA`). Without a logo, the cover shows the client's initials.
 
-## Estrutura
+## Project structure
 
 ```
 drs-relatorio/
 ├── pages/
-│   ├── index.tsx            # Painel de edição + prévia (3 abas)
-│   ├── relatorio.tsx        # Rota limpa do relatório (usada pelo Puppeteer)
-│   ├── proposta.tsx         # Rota limpa da proposta
-│   ├── holding.tsx          # Rota limpa da holding
+│   ├── index.tsx            # Editing panel + preview (3 tabs)
+│   ├── relatorio.tsx        # Clean report route (used by Puppeteer)
+│   ├── proposta.tsx         # Clean proposal route
+│   ├── holding.tsx          # Clean holding route
 │   └── api/
-│       ├── gerar-pdf.ts     # Gera o PDF via Puppeteer
-│       └── foto-pessoa.ts   # Fotos da equipe em base64 para a prévia
+│       ├── gerar-pdf.ts     # Generates the PDF with Puppeteer
+│       └── foto-pessoa.ts   # Team photos as base64 for the preview
 ├── components/
 │   ├── RelatorioContent.tsx
 │   ├── PropostaContent.tsx
 │   ├── HoldingContent.tsx
 │   └── LogoDRS.tsx
-├── public/                  # Logo DRS, fundo, ícones de redes (+ pastas locais de cliente)
+├── public/                  # DRS logo, background, social icons (+ local client folders)
 └── styles/globals.css
 ```
 
-## Observações de deploy
+## Deployment notes
 
-O Puppeteer precisa de um ambiente com Chrome — funciona em servidor próprio, VPS ou container. Em plataformas serverless (Vercel, Netlify) é preciso trocar para `puppeteer-core` + `@sparticuz/chromium`.
+Puppeteer needs an environment with Chrome — it runs on your own server, a VPS or a container. On serverless platforms (Vercel, Netlify) switch to `puppeteer-core` + `@sparticuz/chromium`.
 
 ---
 
-Desenvolvido por [Ian Leão](https://github.com/ianleaao) para a DRS Advogados Associados — Brasília/DF.
+Built by [Ian Leão](https://github.com/ianleaao) for DRS Advogados Associados — Brasília, Brazil.

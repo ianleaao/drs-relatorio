@@ -1,7 +1,7 @@
 {
   "name": "drs-relatorio",
   "version": "1.0.0",
-  "description": "Gerador de relatórios mensais, propostas de honorários e apresentações de holding em PDF para a DRS Advogados Associados",
+  "description": "Monthly report, fee proposal and holding presentation PDF generator for DRS Advogados Associados",
   "private": true,
   "scripts": {
     "dev": "next dev",

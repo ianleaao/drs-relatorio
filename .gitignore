@@ -9,10 +9,10 @@ next-env.d.ts.bak
 .DS_Store
 Thumbs.db
 
-# Dados do cliente — ficam só na máquina local (não publicar)
+# Client data — kept on the local machine only (do not publish)
 public/pessoas/*
 public/clientes/*
 public/clientes-relatorio/*
-!public/pessoas/LEIAME.md
-!public/clientes/LEIAME.md
-!public/clientes-relatorio/LEIAME.md
+!public/pessoas/README.md
+!public/clientes/README.md
+!public/clientes-relatorio/README.md

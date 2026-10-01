@@ -6,7 +6,7 @@
  * Estrutura de arquivos esperada em /public:
  *   /logo-drs.png          → logo da DRS  (renomear "Logo Drs.png")
  *   /Foto fundo/fundo.jpg  → imagem de fundo
- *   /clientes/[nome].png   → logo do cliente (renomear pasta "DRS CLIENTES" → "clientes")
+ *   /clientes/[nome].png   → logo do cliente (proposta e holding usam /clientes-relatorio/)
  */
 
 'use client';
@@ -21,6 +21,8 @@ export interface RelatorioProps {
   ano:                 string;
   atividades:          string[];
   logoClienteArquivo?: string;  // nome do arquivo sem extensão, ex: "AFIX"
+  horasTotais?:        string;  // ex: "32h"
+  horasAtividades?:    string[]; // ex: ["4h", "2h30", ""] — same length as atividades
 }
 
 // ─── Utilitários ──────────────────────────────────────────────────────────────
@@ -115,10 +117,11 @@ function LogoCliente({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      key={tentativas[extIdx]}          // força remount ao trocar src
+      key={tentativas[extIdx]}
       src={tentativas[extIdx]}
       alt={nome}
-      onError={() => setExtIdx(i => i + 1)}   // próxima extensão
+      className="client-logo-img"
+      onError={() => setExtIdx(i => i + 1)}
       style={imgStyle}
     />
   );
@@ -142,7 +145,7 @@ function HeroPill({ children }: { children: React.ReactNode }) {
       padding: '5px 14px', borderRadius: '999px',
       border: '1px solid rgba(46,111,212,0.35)',
       background: 'rgba(46,111,212,0.12)',
-      color: '#93c5fd', fontSize: '11px', fontWeight: 700,
+      color: '#93c5fd', fontSize: '13px', fontWeight: 700,
       letterSpacing: '0.03em', whiteSpace: 'nowrap',
     }}>
       {children}
@@ -167,8 +170,44 @@ function SectionDivider({ icon = '⚖' }: { icon?: string }) {
   );
 }
 
+/** Caixinha de resumo de horas trabalhadas no mês. */
+function HorasBox({ horas }: { horas: string }) {
+  return (
+    <div style={{
+      background:    'rgba(46,111,212,0.1)',
+      border:        '1px solid rgba(46,111,212,0.25)',
+      borderRadius:  '14px',
+      padding:       '24px 32px',
+      display:       'flex',
+      alignItems:    'center',
+      gap:           '20px',
+      marginBottom:  '32px',
+    }}>
+      <span style={{ fontSize: '30px', flexShrink: 0, lineHeight: 1 }}>⏱</span>
+      <div>
+        <div style={{
+          fontSize:      '11px',
+          fontWeight:    700,
+          color:         'rgba(255,255,255,0.45)',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          marginBottom:  '6px',
+        }}>
+          Horas trabalhadas no mês
+        </div>
+        <div style={{ fontSize: '44px', fontWeight: 900, color: 'white', lineHeight: 1 }}>
+          {horas}
+        </div>
+        <div style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
+          no período de referência
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /** Card de atividade com número outline + badge + texto + hover. */
-function AtividadeCard({ index, texto }: { index: number; texto: string }) {
+function AtividadeCard({ index, texto, horas }: { index: number; texto: string; horas?: string }) {
   const cat = inferirCategoria(texto);
   const num = String(index + 1).padStart(2, '0');
   const [hovered, setHovered] = useState(false);
@@ -188,18 +227,16 @@ function AtividadeCard({ index, texto }: { index: number; texto: string }) {
         boxShadow:    hovered ? '0 0 0 1px rgba(46,111,212,0.12), inset 0 0 20px rgba(46,111,212,0.04)' : 'none',
       }}
     >
-      {/* Número em estilo outline com gradiente */}
+      {/* Número */}
       <span style={{
-        fontSize:              '20px',
-        fontWeight:            900,
-        WebkitTextStroke:      '1.5px #2e6fd4',
-        WebkitTextFillColor:   'transparent',
-        color:                 'transparent',
-        lineHeight:            1,
-        minWidth:              '28px',
-        paddingTop:            '2px',
-        userSelect:            'none',
-        flexShrink:            0,
+        fontSize:   '24px',
+        fontWeight: 900,
+        color:      '#2e6fd4',
+        lineHeight: 1,
+        minWidth:   '30px',
+        paddingTop: '2px',
+        userSelect: 'none',
+        flexShrink: 0,
       }}>
         {num}
       </span>
@@ -209,18 +246,36 @@ function AtividadeCard({ index, texto }: { index: number; texto: string }) {
         <span style={{
           display: 'inline-block', padding: '2px 10px', borderRadius: '999px',
           background: cat.bg, color: cat.color,
-          fontSize: '9.5px', fontWeight: 700,
+          fontSize: '13px', fontWeight: 700,
           letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '8px',
         }}>
           {cat.label}
         </span>
         <p style={{
-          margin: 0, fontSize: '13px', color: 'rgba(255,255,255,0.88)',
-          lineHeight: 1.6, fontWeight: 400,
+          margin: 0, fontSize: '17px', color: 'rgba(255,255,255,0.88)',
+          lineHeight: 1.65, fontWeight: 400,
         }}>
           {texto}
         </p>
       </div>
+
+      {/* Badge de horas — exibida somente se informada */}
+      {horas && horas.trim() && (
+        <span style={{
+          background:   'rgba(255,255,255,0.05)',
+          border:       '1px solid rgba(96,165,250,0.2)',
+          borderRadius: '6px',
+          padding:      '3px 10px',
+          fontSize:     '15px',
+          fontWeight:   700,
+          color:        '#60a5fa',
+          whiteSpace:   'nowrap',
+          flexShrink:   0,
+          alignSelf:    'center',
+        }}>
+          {horas}
+        </span>
+      )}
     </div>
   );
 }
@@ -228,17 +283,14 @@ function AtividadeCard({ index, texto }: { index: number; texto: string }) {
 // ─── Componente principal ─────────────────────────────────────────────────────
 
 export default function RelatorioContent({
-  cliente, mes, ano, atividades, logoClienteArquivo,
+  cliente, mes, ano, atividades, logoClienteArquivo, horasTotais, horasAtividades,
 }: RelatorioProps) {
   const mesNome = nomeMes(mes);
   const total   = atividades.filter(a => a.trim()).length;
   const periodo = `${mesNome} · ${ano}`;
 
   const gradientText: React.CSSProperties = {
-    background:             'linear-gradient(135deg, #2e6fd4 0%, #93c5fd 60%, #bfdbfe 100%)',
-    WebkitBackgroundClip:   'text',
-    WebkitTextFillColor:    'transparent',
-    backgroundClip:         'text',
+    color: '#60a5fa',
   };
 
   // Fundo hero: cor base + glow radial + grid sutil
@@ -373,7 +425,7 @@ export default function RelatorioContent({
                 padding: '6px 16px', borderRadius: '999px',
                 border: '1px solid rgba(46,111,212,0.4)',
                 background: 'rgba(46,111,212,0.1)',
-                color: '#93c5fd', fontSize: '10px', fontWeight: 700,
+                color: '#93c5fd', fontSize: '12px', fontWeight: 700,
                 letterSpacing: '0.16em', textTransform: 'uppercase',
               }}>
                 <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#2e6fd4', display: 'inline-block' }} />
@@ -386,7 +438,7 @@ export default function RelatorioContent({
                 padding: '6px 16px', borderRadius: '8px',
                 background: 'rgba(26,63,128,0.25)',
                 border: '1px solid rgba(46,111,212,0.3)',
-                fontSize: '11px', fontWeight: 700,
+                fontSize: '13px', fontWeight: 700,
                 color: 'rgba(255,255,255,0.65)',
                 letterSpacing: '0.06em',
               }}>
@@ -408,14 +460,14 @@ export default function RelatorioContent({
               backdropFilter: 'blur(4px)',
             }}>
               <p style={{
-                margin: 0, fontSize: '9px', color: 'rgba(255,255,255,0.3)',
+                margin: 0, fontSize: '11px', color: 'rgba(255,255,255,0.3)',
                 fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase',
               }}>
                 Preparado para
               </p>
               {/* Logo grande 80×80 */}
               <LogoCliente arquivo={logoClienteArquivo ?? ''} nome={cliente} size="lg" />
-              <span style={{ fontSize: '18px', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: '20px', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>
                 {cliente || 'Nome do Cliente'}
               </span>
             </div>
@@ -423,14 +475,14 @@ export default function RelatorioContent({
             {/* Título principal — Relatório + Mês */}
             <div style={{ lineHeight: 1 }}>
               <h1 style={{
-                margin: 0, fontSize: '76px', fontWeight: 900,
+                margin: 0, fontSize: '86px', fontWeight: 900,
                 letterSpacing: '-0.04em', lineHeight: 0.98,
                 color: '#ffffff',
               }}>
                 Relatório
               </h1>
               <h2 style={{
-                margin: 0, fontSize: '76px', fontWeight: 900,
+                margin: 0, fontSize: '86px', fontWeight: 900,
                 letterSpacing: '-0.04em', lineHeight: 0.98,
                 ...gradientText,
               }}>
@@ -440,7 +492,7 @@ export default function RelatorioContent({
 
             {/* Subtítulo */}
             <p style={{
-              margin: 0, fontSize: '14px',
+              margin: 0, fontSize: '16px',
               color: 'rgba(255,255,255,0.38)', fontWeight: 400,
               lineHeight: 1.7, maxWidth: '500px',
             }}>
@@ -471,14 +523,14 @@ export default function RelatorioContent({
               {/* Período de referência */}
               <div>
                 <p style={{
-                  margin: 0, fontSize: '9.5px', color: 'rgba(255,255,255,0.28)',
+                  margin: 0, fontSize: '11.5px', color: 'rgba(255,255,255,0.28)',
                   fontWeight: 700, letterSpacing: '0.2em',
                   textTransform: 'uppercase', marginBottom: '5px',
                 }}>
                   Período de referência
                 </p>
                 <p style={{
-                  margin: 0, fontSize: '18px', fontWeight: 800,
+                  margin: 0, fontSize: '20px', fontWeight: 800,
                   color: '#fff', letterSpacing: '-0.01em',
                 }}>
                   {periodo}
@@ -511,10 +563,15 @@ export default function RelatorioContent({
           {/* Separador de seção */}
           <SectionDivider icon="⚖" />
 
+          {/* Caixinha de horas totais — exibida somente se informadas */}
+          {horasTotais && horasTotais.trim() && (
+            <HorasBox horas={horasTotais} />
+          )}
+
           {/* Cabeçalho da seção */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
             <h3 style={{
-              margin: 0, fontSize: '11px', fontWeight: 700,
+              margin: 0, fontSize: '15px', fontWeight: 700,
               color: 'rgba(255,255,255,0.38)', letterSpacing: '0.18em',
               textTransform: 'uppercase', whiteSpace: 'nowrap',
             }}>
@@ -524,7 +581,7 @@ export default function RelatorioContent({
               flex: 1, height: '1px',
               background: 'linear-gradient(90deg, rgba(46,111,212,0.28) 0%, transparent 100%)',
             }} />
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#2e6fd4', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: '#2e6fd4', whiteSpace: 'nowrap' }}>
               {total} total
             </span>
           </div>
@@ -560,7 +617,7 @@ export default function RelatorioContent({
                     border:       '1.5px solid #060e1f',
                     boxShadow:    '0 0 6px rgba(46,111,212,0.5)',
                   }} />
-                  <AtividadeCard index={i} texto={atividade} />
+                  <AtividadeCard index={i} texto={atividade} horas={horasAtividades?.[i]} />
                 </div>
               ))}
             </div>
@@ -603,7 +660,7 @@ export default function RelatorioContent({
               flex-shrink: 0;
             }
             .contact-label {
-              font-size: 9px;
+              font-size: 11px;
               color: #64748b;
               text-transform: uppercase;
               letter-spacing: 0.12em;
@@ -611,7 +668,7 @@ export default function RelatorioContent({
               margin-bottom: 2px;
             }
             .contact-value {
-              font-size: 12px;
+              font-size: 14px;
               font-weight: 700;
               color: rgba(255,255,255,0.82);
             }
@@ -710,7 +767,7 @@ export default function RelatorioContent({
               }} />
               <p style={{
                 margin:        0,
-                fontSize:      '13px',
+                fontSize:      '15px',
                 fontWeight:    700,
                 color:         '#ffffff',
                 letterSpacing: '-0.01em',
@@ -760,7 +817,7 @@ export default function RelatorioContent({
               }}>
                 <p style={{
                   margin:        0,
-                  fontSize:      '12px',
+                  fontSize:      '14px',
                   fontWeight:    700,
                   color:         '#93c5fd',
                   lineHeight:    1.6,
@@ -782,7 +839,7 @@ export default function RelatorioContent({
           <p style={{
             margin:        0,
             textAlign:     'center',
-            fontSize:      '10px',
+            fontSize:      '12px',
             color:         'rgba(255,255,255,0.12)',
             letterSpacing: '0.08em',
             paddingBottom: '20px',

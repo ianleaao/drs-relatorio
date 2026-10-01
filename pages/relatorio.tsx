@@ -64,6 +64,12 @@ export default function Relatorio(props: RelatorioProps) {
             padding-bottom:   0 !important;
           }
 
+          /* Logo do cliente — garante renderização correta no Puppeteer */
+          .client-logo-img {
+            display: block;
+            object-fit: contain;
+          }
+
           /* Atividades começam rente ao topo da página 2 */
           .activities-section {
             margin-top:        0 !important;
@@ -71,8 +77,10 @@ export default function Relatorio(props: RelatorioProps) {
             break-before:      avoid !important;
           }
 
-          /* Nunca cortar dentro de um card */
-          .act-card {
+          /* Nunca cortar dentro de um card ou caixinha */
+          .act-card,
+          .quadro,
+          .investment-box {
             break-inside:      avoid !important;
             page-break-inside: avoid !important;
             margin-bottom:     12px !important;
@@ -80,6 +88,8 @@ export default function Relatorio(props: RelatorioProps) {
 
           /* Permite quebra entre cards */
           .activities-grid {
+            orphans: 4;
+            widows:  4;
             break-inside: auto !important;
           }
 
@@ -96,18 +106,21 @@ export default function Relatorio(props: RelatorioProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<RelatorioProps> = async ({ query }) => {
-  const cliente             = (query.cliente as string) || 'Nome do Cliente';
-  const mes                 = (query.mes     as string) || String(new Date().getMonth() + 1);
-  const ano                 = (query.ano     as string) || String(new Date().getFullYear());
-  const logoClienteArquivo  = (query.logo    as string) || '';
+  const cliente             = (query.cliente     as string) || 'Nome do Cliente';
+  const mes                 = (query.mes         as string) || String(new Date().getMonth() + 1);
+  const ano                 = (query.ano         as string) || String(new Date().getFullYear());
+  const logoClienteArquivo  = (query.logo        as string) || '';
+  const horasTotais         = (query.horasTotal  as string) || '';
 
-  // Extrai atividades: a1, a2, a3, ...
-  const atividades: string[] = [];
+  // Extrai atividades: a1, a2, a3, ... e horas por atividade: h1, h2, h3, ...
+  const atividades:       string[] = [];
+  const horasAtividades:  string[] = [];
   let i = 1;
   while (query[`a${i}`]) {
     atividades.push(query[`a${i}`] as string);
+    horasAtividades.push((query[`h${i}`] as string) || '');
     i++;
   }
 
-  return { props: { cliente, mes, ano, atividades, logoClienteArquivo } };
+  return { props: { cliente, mes, ano, atividades, logoClienteArquivo, horasTotais, horasAtividades } };
 };

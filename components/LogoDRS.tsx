@@ -13,8 +13,8 @@ interface Props {
   align?: 'left' | 'center' | 'right';
 }
 
-const heights: Record<string, string> = { sm: '28px', md: '40px', lg: '56px' };
-const subSizes: Record<string, string> = { sm: '5.5px', md: '7px', lg: '9px' };
+const heights: Record<string, string> = { sm: '28px', md: '40px', lg: '120px' };
+const subSizes: Record<string, string> = { sm: '5.5px', md: '7px', lg: '14px' };
 
 export default function LogoDRS({ size = 'md', align = 'left' }: Props) {
   const [imgError, setImgError] = useState(false);
@@ -44,7 +44,7 @@ export default function LogoDRS({ size = 'md', align = 'left' }: Props) {
     <div style={{ textAlign, lineHeight: 1 }}>
       <div
         style={{
-          fontSize:      size === 'lg' ? '32px' : size === 'md' ? '22px' : '16px',
+          fontSize:      size === 'lg' ? '64px' : size === 'md' ? '22px' : '16px',
           fontWeight:    900,
           color:         '#ffffff',
           letterSpacing: '-0.02em',

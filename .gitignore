@@ -4,3 +4,15 @@ out
 .env
 .env.local
 .env.*.local
+*.tsbuildinfo
+next-env.d.ts.bak
+.DS_Store
+Thumbs.db
+
+# Dados do cliente — ficam só na máquina local (não publicar)
+public/pessoas/*
+public/clientes/*
+public/clientes-relatorio/*
+!public/pessoas/LEIAME.md
+!public/clientes/LEIAME.md
+!public/clientes-relatorio/LEIAME.md
